@@ -1,0 +1,57 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nome": "Administrador",
+      "email": "admin@bet.com",
+      "senha": "123",
+      "perfil": "admin",
+      "saldo": 0
+    },
+    {
+      "id": "2",
+      "nome": "João Jogador",
+      "email": "joao@bet.com",
+      "senha": "123",
+      "perfil": "usuario",
+      "saldo": 950
+    }
+  ],
+  "eventos": [
+    {
+      "id": "1",
+      "timeA": "Brasil",
+      "timeB": "Argentina",
+      "esporte": "Futebol",
+      "data": "2026-06-20",
+      "status": "aberto",
+      "resultado": "",
+      "odds": {
+        "vitoriaA": 1.5,
+        "empate": 3,
+        "vitoriaB": 2.8
+      }
+    }
+  ],
+  "apostas": [
+    {
+      "id": "1",
+      "usuarioId": 2,
+      "eventoId": 1,
+      "palpite": "Brasil",
+      "valor": 100,
+      "status": "pendente",
+      "retorno": 0
+    },
+    {
+      "id": "KXUA72R2h-E",
+      "usuarioId": "2",
+      "eventoId": "1",
+      "palpite": "vitoriaA",
+      "odd": 1.5,
+      "valor": 50,
+      "status": "pendente",
+      "retornoPotencial": 75
+    }
+  ]
+}
