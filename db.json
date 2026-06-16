@@ -14,7 +14,7 @@
       "email": "joao@bet.com",
       "senha": "123",
       "perfil": "usuario",
-      "saldo": 950
+      "saldo": 830
     }
   ],
   "eventos": [
@@ -52,6 +52,37 @@
       "valor": 50,
       "status": "pendente",
       "retornoPotencial": 75
+    },
+    {
+      "id": "9K4JRzdFNuc",
+      "usuarioId": "2",
+      "eventoId": "1",
+      "palpite": "empate",
+      "odd": 3,
+      "valor": 20,
+      "status": "pendente",
+      "retornoPotencial": 60
+    },
+    {
+      "id": "sBQyeJyaO5I",
+      "usuarioId": "2",
+      "eventoId": "1",
+      "palpite": "empate",
+      "odd": 3,
+      "valor": 60,
+      "status": "pendente",
+      "retornoPotencial": 180
+    },
+    {
+      "id": "zzFmlOBl84c",
+      "usuarioId": "2",
+      "eventoId": "1",
+      "palpite": "empate",
+      "odd": 3,
+      "valor": 40,
+      "status": "pendente",
+      "retornoPotencial": 120
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
