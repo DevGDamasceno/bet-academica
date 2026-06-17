@@ -8,6 +8,7 @@ export function DashboardUsuario() {
   
   const [eventos, setEventos] = useState([]);
   const [minhasApostas, setMinhasApostas] = useState([]);
+  const [todosEventos, setTodosEventos] = useState([]); // NOVO ESTADO: Para guardar os nomes de todos os jogos
 
   // Estados para o Boletim de Aposta
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
@@ -31,6 +32,12 @@ export function DashboardUsuario() {
       const resposta = await fetch('http://localhost:3000/eventos?status=aberto');
       const dados = await resposta.json();
       setEventos(dados);
+
+      // NOVO FETCH: Busca todos os eventos para cruzar o ID no histórico
+      const resTodos = await fetch('http://localhost:3000/eventos');
+      const dadosTodos = await resTodos.json();
+      setTodosEventos(dadosTodos);
+
     } catch (error) {
       console.error("Erro ao carregar eventos:", error);
     }
@@ -184,19 +191,32 @@ export function DashboardUsuario() {
               <p style={{ marginTop: '15px', color: '#666' }}>Você ainda não fez nenhuma aposta.</p>
             ) : (
               <ul style={{ listStyle: 'none', marginTop: '15px', padding: 0 }}>
-                {minhasApostas.slice().reverse().map((aposta) => (
-                  <li key={aposta.id} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
-                    <span style={{ color: '#2980b9', fontWeight: 'bold' }}>
-                      Meu Palpite: {aposta.palpite === 'empate' ? 'Empate' : aposta.palpite === 'vitoriaA' ? 'Vitória da Casa' : 'Vitória do Visitante'}
-                    </span>
-                    <br/>
-                    Valor: R$ {(aposta.valor || 0).toFixed(2)} | Odd: {aposta.odd || '-'} | Retorno Potencial: R$ {(aposta.retornoPotencial || 0).toFixed(2)}
-                    <br/>
-                    <small style={{ color: aposta.status === 'ganhou' ? '#27ae60' : aposta.status === 'perdeu' ? '#e74c3c' : '#e67e22', fontWeight: 'bold' }}>
-                      Status: {aposta.status.toUpperCase()}
-                    </small>
-                  </li>
-                ))}
+                {minhasApostas.slice().reverse().map((aposta) => {
+                  
+                  // NOVO: Busca o nome do jogo correspondente ao ID da aposta
+                  const eventoDaAposta = todosEventos.find(e => String(e.id) === String(aposta.eventoId));
+                  const nomeDoJogo = eventoDaAposta ? `${eventoDaAposta.timeA} x ${eventoDaAposta.timeB}` : 'Jogo Finalizado';
+
+                  return (
+                    <li key={aposta.id} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
+                      
+                      {/* NOVO: Exibe o nome do jogo */}
+                      <div style={{ marginBottom: '5px', fontSize: '1.05rem' }}>
+                        🏟️ <strong>Jogo: {nomeDoJogo}</strong>
+                      </div>
+
+                      <span style={{ color: '#2980b9', fontWeight: 'bold' }}>
+                        Meu Palpite: {aposta.palpite === 'empate' ? 'Empate' : aposta.palpite === 'vitoriaA' ? 'Vitória da Casa' : 'Vitória do Visitante'}
+                      </span>
+                      <br/>
+                      Valor: R$ {(aposta.valor || 0).toFixed(2)} | Odd: {aposta.odd || '-'} | Retorno Potencial: R$ {(aposta.retornoPotencial || 0).toFixed(2)}
+                      <br/>
+                      <small style={{ color: aposta.status === 'ganhou' ? '#27ae60' : aposta.status === 'perdeu' ? '#e74c3c' : '#e67e22', fontWeight: 'bold' }}>
+                        Status: {aposta.status.toUpperCase()}
+                      </small>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>

@@ -54,13 +54,14 @@
       "timeB": "Japao",
       "esporte": "Futebol",
       "data": "2026-09-11",
-      "status": "aberto",
+      "status": "encerrado",
       "resultado": "",
       "odds": {
         "vitoriaA": 3,
         "empate": 2,
         "vitoriaB": 1
-      }
+      },
+      "resultadoFinal": "empate"
     }
   ],
   "apostas": [
@@ -131,7 +132,7 @@
       "palpite": "vitoriaA",
       "odd": 3,
       "valor": 30,
-      "status": "pendente",
+      "status": "perdeu",
       "retornoPotencial": 90
     }
   ],
