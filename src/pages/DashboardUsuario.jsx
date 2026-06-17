@@ -4,21 +4,50 @@ import { AuthContext } from '../contexts/AuthContext';
 export function DashboardUsuario() {
   const { usuario, logout, atualizarSaldoGlobal } = useContext(AuthContext);
   const [eventos, setEventos] = useState([]);
-  
+  const [minhasApostas, setMinhasApostas] = useState([]);
+
   // Estados para o Boletim de Aposta
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
   const [palpite, setPalpite] = useState(''); // 'vitoriaA', 'empate' ou 'vitoriaB'
   const [valorAposta, setValorAposta] = useState('');
 
+  // 1. Carrega as partidas assim que a tela abre
   useEffect(() => {
     carregarEventos();
   }, []);
 
+  // 2. Busca o histórico de apostas quando o usuário estiver carregado
+  useEffect(() => {
+    if (usuario && usuario.id) {
+      carregarMinhasApostas();
+    }
+  }, [usuario]);
+
   const carregarEventos = async () => {
     // Busca apenas os eventos que estão abertos
-    const resposta = await fetch('http://localhost:3000/eventos?status=aberto');
-    const dados = await resposta.json();
-    setEventos(dados);
+    try {
+      const resposta = await fetch('http://localhost:3000/eventos?status=aberto');
+      const dados = await resposta.json();
+      setEventos(dados);
+    } catch (error) {
+      console.error("Erro ao carregar eventos:", error);
+    }
+  };
+
+  const carregarMinhasApostas = async () => {
+    try {
+      const resposta = await fetch('http://localhost:3000/apostas');
+      const todasApostas = await resposta.json();
+
+      // Filtra as apostas apenas do usuário atual
+      const apenasAsMinhas = todasApostas.filter(
+        (aposta) => String(aposta.usuarioId) === String(usuario.id)
+      );
+
+      setMinhasApostas(apenasAsMinhas);
+    } catch (error) {
+      console.error("Erro ao carregar apostas:", error);
+    }
   };
 
   const selecionarAposta = (evento, tipoPalpite) => {
@@ -34,42 +63,49 @@ export function DashboardUsuario() {
     if (valor <= 0) return alert("Digite um valor válido maior que zero!");
     if (valor > usuario.saldo) return alert("Saldo insuficiente para esta aposta!");
 
-    // 1. Calcula o novo saldo e atualiza no banco de dados (JSON Server)
-    const novoSaldo = usuario.saldo - valor;
-    await fetch(`http://localhost:3000/usuarios/${usuario.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ saldo: novoSaldo })
-    });
+    try {
+      // 1. Calcula o novo saldo e atualiza no banco de dados (JSON Server)
+      const novoSaldo = usuario.saldo - valor;
+      await fetch(`http://localhost:3000/usuarios/${usuario.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ saldo: novoSaldo })
+      });
 
-    // 2. Registra a aposta no banco de dados
-    const oddDoMomento = eventoSelecionado.odds[palpite];
-    const novaAposta = {
-      id: String(Date.now()),
-      usuarioId: usuario.id,
-      eventoId: eventoSelecionado.id,
-      palpite: palpite,
-      odd: oddDoMomento,
-      valor: valor,
-      status: "pendente",
-      retornoPotencial: valor * oddDoMomento
-    };
+      // 2. Registra a aposta no banco de dados
+      const oddDoMomento = eventoSelecionado.odds[palpite];
+      const novaAposta = {
+        id: String(Date.now()),
+        usuarioId: usuario.id,
+        eventoId: eventoSelecionado.id,
+        palpite: palpite,
+        odd: oddDoMomento,
+        valor: valor,
+        status: "pendente",
+        retornoPotencial: valor * oddDoMomento
+      };
 
-    await fetch('http://localhost:3000/apostas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(novaAposta)
-    });
+      await fetch('http://localhost:3000/apostas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novaAposta)
+      });
 
-    // 3. Atualiza a tela e o contexto
-    atualizarSaldoGlobal(novoSaldo);
-    setEventoSelecionado(null);
-    setPalpite('');
-    alert("Aposta registrada com sucesso! Boa sorte!");
+      // 3. Atualiza a tela e o contexto
+      atualizarSaldoGlobal(novoSaldo);
+      setEventoSelecionado(null);
+      setPalpite('');
+      carregarMinhasApostas(); // Recarrega o histórico após a aposta
+      alert("Aposta registrada com sucesso! Boa sorte!");
+    } catch (error) {
+      console.error("Erro ao registrar aposta:", error);
+      alert("Ocorreu um erro ao processar sua aposta. Tente novamente.");
+    }
   };
 
   // Funções para deixar os textos mais amigáveis na tela
   const traduzirPalpite = (tipo, evento) => {
+    if (!evento) return '';
     if (tipo === 'vitoriaA') return `Vitória do ${evento.timeA}`;
     if (tipo === 'vitoriaB') return `Vitória do ${evento.timeB}`;
     return 'Empate';
@@ -90,46 +126,75 @@ export function DashboardUsuario() {
 
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
         
-        {/* Lado Esquerdo: Lista de Eventos */}
-        <div style={{ flex: '2', minWidth: '350px' }}>
-          <h3 style={{ marginBottom: '15px' }}>Partidas Disponíveis</h3>
+        {/* Lado Esquerdo: Lista de Eventos e Histórico */}
+        <div style={{ flex: '2', minWidth: '350px', display: 'flex', flexDirection: 'column', gap: '30px' }}>
           
-          {eventos.length === 0 ? (
-            <p>Nenhuma partida aberta no momento.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {eventos.map((evento) => (
-                <div key={evento.id} style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-                  <h4 style={{ textAlign: 'center', marginBottom: '15px' }}>{evento.timeA} x {evento.timeB}</h4>
-                  
-                  {/* Botões das Odds */}
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button 
-                      onClick={() => selecionarAposta(evento, 'vitoriaA')}
-                      style={{ background: palpite === 'vitoriaA' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
-                      {evento.timeA} <br/> ({evento.odds.vitoriaA})
-                    </button>
+          {/* Seção 1: Partidas */}
+          <div>
+            <h3 style={{ marginBottom: '15px' }}>Partidas Disponíveis</h3>
+            
+            {eventos.length === 0 ? (
+              <p>Nenhuma partida aberta no momento.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {eventos.map((evento) => (
+                  <div key={evento.id} style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                    <h4 style={{ textAlign: 'center', marginBottom: '15px' }}>{evento.timeA} x {evento.timeB}</h4>
                     
-                    <button 
-                      onClick={() => selecionarAposta(evento, 'empate')}
-                      style={{ background: palpite === 'empate' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
-                      Empate <br/> ({evento.odds.empate})
-                    </button>
-                    
-                    <button 
-                      onClick={() => selecionarAposta(evento, 'vitoriaB')}
-                      style={{ background: palpite === 'vitoriaB' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
-                      {evento.timeB} <br/> ({evento.odds.vitoriaB})
-                    </button>
+                    {/* Botões das Odds */}
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        onClick={() => selecionarAposta(evento, 'vitoriaA')}
+                        style={{ background: palpite === 'vitoriaA' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
+                        {evento.timeA} <br/> ({evento.odds.vitoriaA})
+                      </button>
+                      
+                      <button 
+                        onClick={() => selecionarAposta(evento, 'empate')}
+                        style={{ background: palpite === 'empate' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
+                        Empate <br/> ({evento.odds.empate})
+                      </button>
+                      
+                      <button 
+                        onClick={() => selecionarAposta(evento, 'vitoriaB')}
+                        style={{ background: palpite === 'vitoriaB' && eventoSelecionado?.id === evento.id ? '#3498db' : '#2c3e50' }}>
+                        {evento.timeB} <br/> ({evento.odds.vitoriaB})
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Seção 2: Histórico de Apostas */}
+          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+            <h3>Meu Histórico de Apostas</h3>
+            {minhasApostas.length === 0 ? (
+              <p style={{ marginTop: '15px', color: '#666' }}>Você ainda não fez nenhuma aposta.</p>
+            ) : (
+              <ul style={{ listStyle: 'none', marginTop: '15px', padding: 0 }}>
+                {minhasApostas.slice().reverse().map((aposta) => (
+                  <li key={aposta.id} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
+                    <span style={{ color: '#2980b9', fontWeight: 'bold' }}>
+                      Meu Palpite: {aposta.palpite === 'empate' ? 'Empate' : aposta.palpite === 'vitoriaA' ? 'Vitória da Casa' : 'Vitória do Visitante'}
+                    </span>
+                    <br/>
+                    Valor: R$ {(aposta.valor || 0).toFixed(2)} | Odd: {aposta.odd || '-'} | Retorno Potencial: R$ {(aposta.retornoPotencial || 0).toFixed(2)}
+                    <br/>
+                    <small style={{ color: aposta.status === 'ganhou' ? '#27ae60' : aposta.status === 'perdeu' ? '#e74c3c' : '#e67e22', fontWeight: 'bold' }}>
+                      Status: {aposta.status.toUpperCase()}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
         </div>
 
         {/* Lado Direito: Boletim de Aposta */}
-        <div className="login-box" style={{ flex: '1', minWidth: '300px', margin: '0', height: 'fit-content' }}>
+        <div className="login-box" style={{ flex: '1', minWidth: '300px', margin: '0', height: 'fit-content', position: 'sticky', top: '20px' }}>
           <h3>Boletim de Aposta</h3>
           
           {!eventoSelecionado ? (

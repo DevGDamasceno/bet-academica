@@ -14,7 +14,7 @@
       "email": "joao@bet.com",
       "senha": "123",
       "perfil": "usuario",
-      "saldo": 830
+      "saldo": 1130
     }
   ],
   "eventos": [
@@ -24,25 +24,32 @@
       "timeB": "Argentina",
       "esporte": "Futebol",
       "data": "2026-06-20",
-      "status": "aberto",
+      "status": "encerrado",
       "resultado": "",
       "odds": {
         "vitoriaA": 1.5,
         "empate": 3,
         "vitoriaB": 2.8
-      }
+      },
+      "resultadoFinal": "vitoriaB"
+    },
+    {
+      "id": "t1eaVlpzTV8",
+      "timeA": "Brasil",
+      "timeB": "Alemanha",
+      "esporte": "Futebol",
+      "data": "2026-09-10",
+      "status": "encerrado",
+      "resultado": "",
+      "odds": {
+        "vitoriaA": 3,
+        "empate": 4,
+        "vitoriaB": 5
+      },
+      "resultadoFinal": "vitoriaB"
     }
   ],
   "apostas": [
-    {
-      "id": "1",
-      "usuarioId": 2,
-      "eventoId": 1,
-      "palpite": "Brasil",
-      "valor": 100,
-      "status": "pendente",
-      "retorno": 0
-    },
     {
       "id": "KXUA72R2h-E",
       "usuarioId": "2",
@@ -82,6 +89,26 @@
       "valor": 40,
       "status": "pendente",
       "retornoPotencial": 120
+    },
+    {
+      "id": "NbBNiyjaHmQ",
+      "usuarioId": "2",
+      "eventoId": "1",
+      "palpite": "vitoriaB",
+      "odd": 2.8,
+      "valor": 100,
+      "status": "pendente",
+      "retornoPotencial": 280
+    },
+    {
+      "id": "_Wo19CpGIEY",
+      "usuarioId": "2",
+      "eventoId": "t1eaVlpzTV8",
+      "palpite": "vitoriaB",
+      "odd": 5,
+      "valor": 100,
+      "status": "ganhou",
+      "retornoPotencial": 500
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
