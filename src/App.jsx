@@ -4,11 +4,10 @@ import { RotaProtegida } from './routes/RotaProtegida';
 import { Login } from './pages/Login';
 import { DashboardAdmin } from './pages/DashboardAdmin';
 import { DashboardUsuario } from './pages/DashboardUsuario';
-
+import { Ranking } from './pages/Ranking'; // IMPORTAMOS O RANKING
 
 export default function App() {
   return (
-    // O AuthProvider envolve tudo para distribuir os dados do usuário
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -31,6 +30,16 @@ export default function App() {
             element={
               <RotaProtegida perfilRequerido="usuario">
                 <DashboardUsuario />
+              </RotaProtegida>
+            } 
+          />
+
+          {/* Rota Protegida da Funcionalidade Extra (Ranking) */}
+          <Route 
+            path="/ranking" 
+            element={
+              <RotaProtegida>
+                <Ranking />
               </RotaProtegida>
             } 
           />

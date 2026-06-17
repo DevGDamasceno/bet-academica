@@ -1,8 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export function DashboardUsuario() {
   const { usuario, logout, atualizarSaldoGlobal } = useContext(AuthContext);
+  const navigate = useNavigate(); // <-- Inicializando o navigate para redirecionamento
+  
   const [eventos, setEventos] = useState([]);
   const [minhasApostas, setMinhasApostas] = useState([]);
 
@@ -24,7 +27,6 @@ export function DashboardUsuario() {
   }, [usuario]);
 
   const carregarEventos = async () => {
-    // Busca apenas os eventos que estão abertos
     try {
       const resposta = await fetch('http://localhost:3000/eventos?status=aberto');
       const dados = await resposta.json();
@@ -115,8 +117,16 @@ export function DashboardUsuario() {
     <div className="container">
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1>Área do Jogador</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <span>Olá, <strong>{usuario?.nome}</strong></span>
+          
+          {/* BOTÃO DO RANKING ADICIONADO AQUI */}
+          <button 
+            onClick={() => navigate('/ranking')} 
+            style={{ background: '#f39c12', color: 'white', padding: '8px 15px', borderRadius: '4px', fontWeight: 'bold' }}>
+            🏆 Ver Ranking
+          </button>
+
           <span style={{ background: '#27ae60', color: 'white', padding: '8px 15px', borderRadius: '4px', fontWeight: 'bold' }}>
             Saldo: R$ {usuario?.saldo?.toFixed(2)}
           </span>

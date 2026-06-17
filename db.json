@@ -14,7 +14,7 @@
       "email": "joao@bet.com",
       "senha": "123",
       "perfil": "usuario",
-      "saldo": 1130
+      "saldo": 600
     }
   ],
   "eventos": [
@@ -47,6 +47,20 @@
         "vitoriaB": 5
       },
       "resultadoFinal": "vitoriaB"
+    },
+    {
+      "id": "zlaA1Zl2t-o",
+      "timeA": "EUA",
+      "timeB": "Japao",
+      "esporte": "Futebol",
+      "data": "2026-09-11",
+      "status": "aberto",
+      "resultado": "",
+      "odds": {
+        "vitoriaA": 3,
+        "empate": 2,
+        "vitoriaB": 1
+      }
     }
   ],
   "apostas": [
@@ -109,6 +123,16 @@
       "valor": 100,
       "status": "ganhou",
       "retornoPotencial": 500
+    },
+    {
+      "id": "_L-YP6BMwPk",
+      "usuarioId": "2",
+      "eventoId": "zlaA1Zl2t-o",
+      "palpite": "vitoriaA",
+      "odd": 3,
+      "valor": 30,
+      "status": "pendente",
+      "retornoPotencial": 90
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
