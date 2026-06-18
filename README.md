@@ -10,7 +10,8 @@ O Bet Acadêmica é uma plataforma web desenvolvida em React que simula um siste
 * **Jogador:** Pode visualizar as partidas disponíveis, consultar seu saldo fictício e realizar apostas.
 
 ## 🚀 Funcionalidade Extra Escolhida
-**(Escreva aqui a funcionalidade extra que vocês fizeram ou vão fazer. Ex: "Histórico detalhado de resultados no Dashboard do Administrador" ou "Sistema de resgate de bônus diário")**
+**Ranking de jogadores com maior saldo.
+Historico de apostas**
 
 ## 🛠️ Tecnologias Utilizadas
 * React (Vite)
@@ -23,4 +24,21 @@ O Bet Acadêmica é uma plataforma web desenvolvida em React que simula um siste
 
 1. Clone este repositório:
    ```bash
-   git clone [COLE O LINK DO SEU REPOSITORIO AQUI DEPOIS]
+   git clone https://github.com/DevGDamasceno/bet-academica
+   cd bet-academica
+   npm install
+
+### 2. Rodando a API (JSON Server)
+Abra um terminal no VS Code, na raiz do projeto, e inicie o banco de dados fake:
+
+```bash
+npx json-server --watch db.json --port 3000
+
+O servidor estará rodando em: http://localhost:3000/clientes
+
+### 4. Rodando o Front-end (React + Vite)
+Abra um novo terminal (mantendo o anterior aberto) e rode o servidor de desenvolvimento:
+
+npm run dev
+
+Acesse a aplicação no navegador através do link gerado no terminal (geralmente http://localhost:5173)
